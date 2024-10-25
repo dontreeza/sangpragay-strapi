@@ -109,6 +109,17 @@ export async function bootstrap({ strapi }: { strapi: Core.Strapi }) {
     strapi.log.debug('Body parser has been disabled for Apollo server');
   }
 
+  // add the graphql server for koa
+  handler.push(
+    koaMiddleware<DefaultStateExtends, DefaultContextExtends>(server, {
+      // Initialize loaders for this request.
+      context: async ({ ctx }) => ({
+        state: ctx.state,
+        koaContext: ctx,
+      }),
+    })
+  );
+
   // add the Strapi auth middleware
   handler.push((ctx, next) => {
     ctx.state.route = {
@@ -120,17 +131,6 @@ export async function bootstrap({ strapi }: { strapi: Core.Strapi }) {
 
     return strapi.auth.authenticate(ctx, next);
   });
-
-  // add the graphql server for koa
-  handler.push(
-    koaMiddleware<DefaultStateExtends, DefaultContextExtends>(server, {
-      // Initialize loaders for this request.
-      context: async ({ ctx }) => ({
-        state: ctx.state,
-        koaContext: ctx,
-      }),
-    })
-  );
 
   // now that handlers are set up, add the graphql route to our apollo server
   strapi.server.routes([
