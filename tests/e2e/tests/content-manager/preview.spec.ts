@@ -91,6 +91,10 @@ describeOnCondition(edition === 'EE')('Preview', () => {
     expect(src).toContain('/preview/api::article.article/');
     expect(src).toContain('/en/draft');
 
+    // Make the test randomly fail , just for testing purposes
+    const random = Math.random();
+    expect(random).toBeLessThan(0.5);
+
     // Navigate to the published tab
     await clickAndWait(page, page.getByRole('tab', { name: /^Published$/ }));
 
